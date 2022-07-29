@@ -8,6 +8,8 @@ require('hardhat-gas-reporter')
 require('solidity-coverage')
 
 const RINKEBY_URL = process.env.RINKEBY_URL || 'rinkeby-key'
+const POLYGON_TEST_URL = process.env.POLYGON_TEST_URL || 'rinkeby-key'
+
 const PRIVATE_KEY = process.env.PRIVATE_KEY || '0xkey'
 const ETHERSCAN_API = process.env.ETHERSCAN_API || 'etherscan-key'
 const COINMARKETCAP_API = process.env.COINMARKETCAP_API || 'coinmarketcap-key'
@@ -19,6 +21,11 @@ module.exports = {
 			url: RINKEBY_URL,
 			accounts: [PRIVATE_KEY],
 			chainId: 4,
+		},
+		polygonTest: {
+			url: POLYGON_TEST_URL,
+			accounts: [PRIVATE_KEY],
+			chainId: 80001,
 		},
 		localhost: {
 			url: 'http://127.0.0.1:8545/',
