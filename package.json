@@ -11,6 +11,7 @@
 	"devDependencies": {
 		"@chainlink/contracts": "^0.4.2",
 		"@nomicfoundation/hardhat-toolbox": "^1.0.2",
+		"dotenv": "^16.0.1",
 		"hardhat": "^2.10.1",
 		"hardhat-deploy": "^0.11.12",
 		"solhint": "^3.3.7"
