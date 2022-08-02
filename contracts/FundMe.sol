@@ -10,7 +10,7 @@ error FundMe__NotOwner();
  *   @notice This contract os a demo sample funding contract
  *   @dev This implements price feeds as our library
  */
-contract FundeMe {
+contract FundMe {
 	// Type Declarations
 	using PriceConverter for uint256; //imports all of its functions as well
 

@@ -42,7 +42,7 @@ module.exports = {
 		noColors: true,
 		coinmarketcap: COINMARKETCAP_API,
 		currency: 'USD',
-		token: 'MATIC',
+		// token: 'MATIC',
 	},
 	namedAccounts: {
 		deployer: {

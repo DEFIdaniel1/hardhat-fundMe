@@ -1,4 +1,4 @@
-const { network, deployments, getNamedAccounts } = require('hardhat')
+const { network } = require('hardhat')
 const { networkConfig } = require('../helper-hardhat-config')
 const { verify } = require('../utils/verify')
 
@@ -20,7 +20,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 	log('---------------------------------------------')
 	log('Deploying FundMe. Waiting for confirmations...')
 	const fundMe = await deploy('FundMe', {
-		contract: 'FundeMe',
+		// contract: 'FundMe',
 		from: deployer,
 		args: [ethUsdPriceFeedAddress], //input for the solidity file
 		log: true,
