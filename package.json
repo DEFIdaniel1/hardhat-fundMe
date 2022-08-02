@@ -4,7 +4,12 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "hh test",
+		"testLocal": "hh test --network localhost",
+		"testRinkeby": "hh test --network rinkeby",
+		"testMatic": "hh test --network polygon",
+		"lint": "solhint 'contracts/*.sol'",
+		"link:fix": "npm solhint 'contracts/*.sol' --fix"
 	},
 	"author": "",
 	"license": "ISC",
