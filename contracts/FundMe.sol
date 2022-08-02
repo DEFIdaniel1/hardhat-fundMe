@@ -15,11 +15,11 @@ contract FundMe {
 	using PriceConverter for uint256; //imports all of its functions as well
 
 	// State Variables
-	address[] public s_funders;
-	mapping(address => uint256) public s_addressToAmountFunded;
+	address[] private s_funders;
+	mapping(address => uint256) private s_addressToAmountFunded;
 	uint256 public constant MINIMUM_USD = 10 * 1e18; //1e18 will match the eth amount later
-	address public immutable i_owner;
-	AggregatorV3Interface public s_priceFeed;
+	address private immutable i_owner;
+	AggregatorV3Interface private s_priceFeed;
 
 	// Modifiers
 	modifier onlyOwner() {
@@ -87,5 +87,26 @@ contract FundMe {
 		s_funders = new address[](0);
 		(bool success, ) = i_owner.call{value: address(this).balance}('');
 		require(success);
+	}
+
+	// View & Pure functions
+	function getOwner() public view returns (address) {
+		return i_owner;
+	}
+
+	function getFunder(uint256 index) public view returns (address) {
+		return s_funders[index];
+	}
+
+	function getAddressToAmountFunded(address funder)
+		public
+		view
+		returns (uint256)
+	{
+		return s_addressToAmountFunded[funder];
+	}
+
+	function getPriceFeed() public view returns (AggregatorV3Interface) {
+		return s_priceFeed;
 	}
 }
