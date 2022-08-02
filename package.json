@@ -9,7 +9,7 @@
 		"testRinkeby": "hh test --network rinkeby",
 		"testMatic": "hh test --network polygon",
 		"lint": "solhint 'contracts/*.sol'",
-		"link:fix": "npm solhint 'contracts/*.sol' --fix"
+		"lint:fix": "solhint 'contracts/*.sol' --fix"
 	},
 	"author": "",
 	"license": "ISC",

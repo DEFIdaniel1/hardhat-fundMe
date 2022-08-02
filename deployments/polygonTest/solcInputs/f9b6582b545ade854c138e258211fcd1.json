@@ -1,0 +1,41 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/FundMe.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.8;\n\nimport \"./PriceConverter.sol\";\n\nerror NotOwner();\n\ncontract FundeMe {\n    using PriceConverter for uint; //imports all of its functions as well\n\n    uint public constant MINIMUM_USD = 10 * 1e18; //1e18 will match the eth amount later\n\n    address[] public funders;\n    mapping(address => uint) public addressToAmountFunded;\n\n    address public immutable i_owner;\n    AggregatorV3Interface public priceFeed;\n\n    constructor(address priceFeedAddress){\n        i_owner = msg.sender; //owner will be whoever deploys the contract\n        priceFeed = AggregatorV3Interface(priceFeedAddress); //interact w/ chainlink contract this way\n    }\n\n    function fund() public payable {\n        //1. Send ETH to the contract\n        require(msg.value.getConversionRate(priceFeed) >= MINIMUM_USD, \"Not enough ETH!\"); \n        //can use getConversionRate from the library; \n        //same as getConversionRate(msg.value, priceFeed); B/C msg.value... is auto-considered the first parameter of the function called from library\n        funders.push(msg.sender);\n        addressToAmountFunded[msg.sender] = msg.value; //set their address to 0\n    }\n\n    function withdraw() public onlyOwner {\n        for(uint i = 0; i < funders.length; i++) {\n            address funder = funders[i];\n            addressToAmountFunded[funder] = 0; //set value of that funder to 0\n        }\n        //reset the array\n        funders = new address[](0); //creates a new array of 0 elements\n        //withdraw the funds through transfer - 3 methods\n\n        //transfer\n        payable(msg.sender).transfer(address(this).balance); \n        //send\n        bool sendSuccess = payable(msg.sender).send(address(this).balance);\n        require(sendSuccess, \"Send failed\");\n        //call\n        (bool callSuccess, ) = payable(msg.sender).call{value: address(this).balance}(\"\");\n        require(callSuccess, \"Call failed\");\n    }\n\n    //modifier is a KW you can add directly in function\n    modifier onlyOwner {\n        // require(msg.sender == i_owner, \"Sender is not owner!\"); //use if statement instead to save gas\n        if(msg.sender != i_owner) { revert NotOwner(); } //must run this condition before the rest of the function\n        _; //represents completing the rest of the code\n    }\n    receive() external payable {\n        fund();\n    }\n    fallback() external payable {\n        fund();\n    }\n}"
+    },
+    "contracts/PriceConverter.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.8;\n\nimport \"@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol\";\n/**\n * THIS EXAMPLE USES UN-AUDITED CODE.\n * Network: Rinkeby\n * Base: BTC/USD\n * Base Address: 0xECe365B379E1dD183B20fc5f022230C044d51404\n * Quote: EUR/USD\n * Quote Address: 0x78F9e60608bF48a1155b4B2A5e31F32318a1d85F\n * Decimals: 8 <-----SHOWS DECIMAL VALUE\n */\n\nlibrary PriceConverter {\n    \n    function getEthPrice(AggregatorV3Interface priceFeed) internal view returns(uint) {\n        //interacting w/ external ChainLink contract - dynamic based on chain for the correct address\n        (, int price,,,) = priceFeed.latestRoundData();\n        //outputs ETH price in USD up to 8 decimals in this case\n        return uint(price * 1e10); //price is 1e8; 1**10 will add the 10 more decimals needed to match msg.value, which = 1e18\n        //needed to wrap in uint() to also convert/match the msg.value type from INT => UINT\n    }\n\n    function getConversionRate(uint ethAmount, AggregatorV3Interface priceFeed) internal view returns(uint) {\n        uint ethPrice = getEthPrice(priceFeed);\n        uint ethAmountInUsd = (ethPrice * ethAmount) / 1e18; \n        //need to divide by 1e18 since it would otherwise return 1e36 decimals (due to multiplication). \n        //This returns whole Eth price w/o decimals. /1e16 would provide 2 more digits, but would need to add decimals later somehow\n        return ethAmountInUsd;\n    }\n}"
+    },
+    "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ninterface AggregatorV3Interface {\n  function decimals() external view returns (uint8);\n\n  function description() external view returns (string memory);\n\n  function version() external view returns (uint256);\n\n  function getRoundData(uint80 _roundId)\n    external\n    view\n    returns (\n      uint80 roundId,\n      int256 answer,\n      uint256 startedAt,\n      uint256 updatedAt,\n      uint80 answeredInRound\n    );\n\n  function latestRoundData()\n    external\n    view\n    returns (\n      uint80 roundId,\n      int256 answer,\n      uint256 startedAt,\n      uint256 updatedAt,\n      uint80 answeredInRound\n    );\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}
